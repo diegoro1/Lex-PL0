@@ -13,7 +13,7 @@ gcc compiler
 
 An input file is already given, simply run lex.c with gcc and check output.txt for the tokens. 
 
-To change input, simply change the content inside input.txt. DO NOT change any file names. If a new input file is needed, delete the given input file and change your input file to ‘input.txt’
+To change input, simply change the content inside input.txt. DO NOT change any file names. If a new input file is needed, delete the given input file and change your input file name to input.txt
 
 
 ## Authors
