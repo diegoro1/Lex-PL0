@@ -179,8 +179,29 @@ char alpha_token(token *tokenArray, char c, FILE *ifp, int *index)
     return c;
 }
 
+char comment(FILE *ifp, char c)
+{
+    c = fgetc(ifp);
+    while(c != EOF)
+    {
+        if (c == '*')
+        {
+            c = fgetc(ifp);
+            if (c == '/' || c == EOF)
+                return c;
+            else 
+                ungetc(c, ifp);
+        }
+
+        c = fgetc(ifp);
+    }
+
+    return c;
+}
+
 char sym_token(token *tokenArray, char c, FILE *ifp, int *index)
 {   
+    int comment_flag = 0;
     switch(c)
     {
         case '+':
@@ -202,9 +223,19 @@ char sym_token(token *tokenArray, char c, FILE *ifp, int *index)
            break;
         
         case '/':
+           if((c = fgetc(ifp)) == '*') // case with comments
+           {
+               c = comment(ifp, c);
+               printf("%c",c);
+               comment_flag = 1;
+           }
+           else
+           {
+           ungetc(c, ifp);     
            tokenArray[*index].content[0] = c;
            tokenArray[*index].content[1] = '\0'; 
            tokenArray[*index].type = 7;
+           }
            break;
         
         case '(':
@@ -296,7 +327,9 @@ char sym_token(token *tokenArray, char c, FILE *ifp, int *index)
     c = fgetc(ifp);
 
     // increments index
-    *index = *index + 1;
+    if (comment_flag == 0)
+        *index = *index + 1;
+        
     return c;
 }
 
@@ -445,10 +478,9 @@ int main(void)
         {
             c = sym_token(tokenArray, c, ifp, &index);
         }
+        // for debugging
         //fprintf(ofp, "%s | %d\n index = %d\n\n", tokenArray[index - 1].content, tokenArray[index - 1].type, index);
     }
-
-    printf("Passed");
 
     print_source(ifp, ofp);
     print_table(tokenArray, ofp, index);
